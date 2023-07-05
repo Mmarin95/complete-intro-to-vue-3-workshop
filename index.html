@@ -21,10 +21,18 @@
 		<p v-if="characterList.length === 0">No characters</p>
 
 		<div v-else>
+			<h2>Characters breakdown</h2>
+			<ul>
+				<li v-for="(stat, key) in characterBreakdown">
+					{{ key }}: {{ stat }}
+				</li>
+			</ul>
+
+
 			<p>Characters {{ characterList.length }}</p>
 			<ul>
 				<li v-for="character in characterList" :key="character.id">
-					<p>{{ character.name }} </p>
+					<p>{{ character.name }} (Favs: {{ character.timesFavorite }}, side: {{ character.side }}) </p>
 					<button @click="setFavorite(character.id)">Set favorite</button>
 				</li>
 			</ul>
@@ -48,28 +56,48 @@
 		const {createApp} = Vue;
 		const app = createApp({
 			data: () => ({
+				mostFavoriteCharacter: "",
 				newCharacter: {
 					name: "",
+					timesFavorite: 0,
+					side: "light",
 				},
 				characterList: [
-					{name: "Luke Skywalker", id: 1},
-					{name: "C-3PO", id: 2},
-					{name: "R2-D2", id: 3},
-					{name: "Darth Vader", id: 4},
-					{name: "Leia Organa", id: 5},
-					{name: "Owen Lars", id: 6},
-					{name: "Beru Whitesun lars", id: 7},
+					{name: "Luke Skywalker", id: 1, timesFavorite: 0, side: "light"},
+					{name: "C-3PO", id: 2, timesFavorite: 0, side: "dark"},
+					{name: "R2-D2", id: 3, timesFavorite: 0, side: "light"},
+					{name: "Darth Vader", id: 4, timesFavorite: 0, side: "dark"},
+					{name: "Leia Organa", id: 5, timesFavorite: 0, side: "light"},
+					{name: "Owen Lars", id: 6, timesFavorite: 0, side: "light"},
+					{name: "Beru Whitesun lars", id: 7, timesFavorite: 0, side: "light"},
 				],
 				favoriteCharacterList: [],
 			}),
+			computed: {
+				characterBreakdown() {
+					let statistics = {
+						light: 0,
+						dark: 0,
+					};
+					this.characterList.forEach((character) => {
+						statistics[character.side]++;
+					});
+
+					return statistics;
+				}
+
+			},
 			methods: {
 				setFavorite(id) {
 					const character = this.characterList.find((character) => character.id === id);
+					character.timesFavorite++;
 					this.favoriteCharacterList.push(character);
+					console.log(this.favoriteCharacterList);
 				},
 				addCharacter() {
-					this.characterList.push({name: this.newCharacter.name, id: this.characterList.length + 1});
+					this.characterList.push({...this.newCharacter, id: this.characterList.length + 1});
 					this.newCharacter.name = "";
+					this.newCharacter.timesFavorite = 0;
 				},
 			},
 		});
